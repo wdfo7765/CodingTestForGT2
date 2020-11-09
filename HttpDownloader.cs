@@ -23,7 +23,14 @@ namespace CodingTestForGT2Junior
             downlaodLocalFolderPath = Console.ReadLine();
             Console.WriteLine();
 
-            if (File.Exists(downlaodLocalFolderPath)) File.Delete(downlaodLocalFolderPath);
+
+            if (File.Exists(downlaodLocalFolderPath))
+            {
+                FileInfo file = new FileInfo(downlaodLocalFolderPath);
+                file.IsReadOnly = false;
+                File.Delete(downlaodLocalFolderPath);
+            }
+
 
             if(!Directory.CreateDirectory(Path.GetDirectoryName(downlaodLocalFolderPath)).Exists)
             {
@@ -34,8 +41,10 @@ namespace CodingTestForGT2Junior
             //http://www.celestrak.com/NORAD/elements/tle-new.txt
             using (var client = new WebClient())
             {
-                client.DownloadFile(url, downlaodLocalFolderPath);
-            }
+    
+                client.DownloadFile(url, downlaodLocalFolderPath);//여기서 인증오류 나고있음
+
+               }
 
             if (File.Exists(downlaodLocalFolderPath))
             {
