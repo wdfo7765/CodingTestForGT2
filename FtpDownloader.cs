@@ -10,9 +10,17 @@ namespace CodingTestForGT2Junior
 {
     public class FtpDownloader : IDownloader
     {
+
+        List<string> downLoadList = new List<string>();
+        string[] downloadFiles;
+        string address, id, password, remotePath, localFolderPath;
+
+        StringBuilder result = new StringBuilder();
+        FtpWebRequest reqFTP;
+
         bool IDownloader.DoDownload(out string resultMsg)
         {
-            string address, id, password,remotePath,localFolderPath;
+            
             Console.WriteLine("<FTP Data Downloader>");
             Console.Write("Input Addrrss to download data: ");
             address = Console.ReadLine();
@@ -27,122 +35,114 @@ namespace CodingTestForGT2Junior
             localFolderPath = Console.ReadLine();
             Console.WriteLine();
 
-            List<string> downLoadList = new List<string>();
-            string[] downloadFiles;
-            StringBuilder result = new StringBuilder();
-            FtpWebRequest reqFTP;
-            try
+            string path = address + remotePath;
+            string[] check = path.Split('/');
+            if (check[check.Length-1].IndexOf('.') == -1)
             {
-                reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(address + "/" + remotePath));
-                reqFTP.UseBinary = true;
-                reqFTP.Credentials = new NetworkCredential(id, password);
-                reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
-                WebResponse response = reqFTP.GetResponse();
-                StreamReader reader = new StreamReader(response.GetResponseStream());
+                //폴더일때
+                downloadFiles = findList(address, remotePath);
 
-                string line = reader.ReadLine();
-                while (line != null)
+
+            }
+            else
+            {
+                address = "";
+                for(int i=0; i<check.Length-1;i++)
                 {
-                    result.Append(line);
-                    result.Append("\n");
-                    line = reader.ReadLine();
-                }
-                result.Remove(result.ToString().LastIndexOf('\n'), 1);
-                reader.Close();
-                response.Close();
+                    address += check[i];
 
-                downloadFiles =result.ToString().Split('\n');
+                }
+                downloadFiles = findList(address, "");
                 for (int i = 0; i < downloadFiles.Length; i++)
                 {
-                    Console.WriteLine(downloadFiles[i]);
+                    doDownLoad(address, id, password, localFolderPath, downloadFiles[i]);
+
                 }
+
+
             }
-            catch
+            for(int i = 0; i<downloadFiles.Length;i++)
             {
-                downloadFiles = null;
+               // Console.WriteLine(downLoadList[i]);
             }
-
-
-            for (int i = 0; i < downloadFiles.Length; i++)
+            resultMsg = "";
+            return false;
+        }
+        void doRecursion(string[] files,string address)
+        {
+            for (int i = 0; i < files.Length; i++)
             {
-
-                //다운로드 시작
-                Uri sourceFileUri = new Uri(address+downloadFiles[i]);
-                FtpWebRequest ftpWebRequest = (FtpWebRequest)WebRequest.Create(sourceFileUri);
-
-                ftpWebRequest.Credentials = new NetworkCredential(id, password);
-                ftpWebRequest.Method = WebRequestMethods.Ftp.DownloadFile;
-
-                FtpWebResponse ftpWebResponse = (FtpWebResponse)ftpWebRequest.GetResponse(); //여기서 문제생기네
-                Stream sourceStream = ftpWebResponse.GetResponseStream();
-
-                FileStream targetFileStream = new FileStream(localFolderPath+"/"+downloadFiles[i], FileMode.Create, FileAccess.Write);
-
-
-                int length = 2048;
-                Byte[] buffer = new Byte[length];
-                int bytesRead = sourceStream.Read(buffer, 0, length);
-                while (bytesRead > 0)
+                if (files[i].IndexOf('.') == -1)
                 {
-                    targetFileStream.Write(buffer, 0, length);
-                    bytesRead = sourceStream.Read(buffer, 0, length);
+                    doDownLoad(address +"/"+ files[i], id, password, localFolderPath, files[i]);
                 }
-                targetFileStream.Close();
-                sourceStream.Close();
+                else
+                {
+                    doRecursion(findList(address + remotePath, downloadFiles[i]),address + remotePath + downloadFiles[i]);
 
-                downLoadList.Add(downloadFiles[i]);
+                }
+
+
             }
+        }
+        string[] findList(string address,string remotePath)
+        {
+            string[] files;
+            reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(address  + remotePath));
+            reqFTP.UseBinary = true;
+            reqFTP.Credentials = new NetworkCredential(id, password);
+            reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
+            WebResponse response = reqFTP.GetResponse();
+            StreamReader reader = new StreamReader(response.GetResponseStream());
 
+            string line = reader.ReadLine();
+            while (line != null)
+            {
+                result.Append(line);
+                result.Append("\n");
+                line = reader.ReadLine();
+            }
+            result.Remove(result.ToString().LastIndexOf('\n'), 1);
+            reader.Close();
+            response.Close();
 
-            /*
-            //다운로드 시작
-            Uri sourceFileUri = new Uri(address);
-            FtpWebRequest ftpWebRequest = (FtpWebRequest)WebRequest.Create(sourceFileUri) ;
+            files = result.ToString().Split('\n');
+            for (int i = 0; i < files.Length; i++)
+            {
+                Console.WriteLine(files[i]);
+            }
+            return files;
+        }
+        void doDownLoad(string address, string id, string password,string localFolderPath, string downloadFile)
+        {
+            if(downloadFile.IndexOf('.') ==-1)
+            {
+                return;
+            }
+            Uri sourceFileUri = new Uri(address + downloadFile);
+            FtpWebRequest ftpWebRequest = (FtpWebRequest)WebRequest.Create(sourceFileUri);
 
             ftpWebRequest.Credentials = new NetworkCredential(id, password);
             ftpWebRequest.Method = WebRequestMethods.Ftp.DownloadFile;
 
-            FtpWebResponse ftpWebResponse = (FtpWebResponse)ftpWebRequest.GetResponse() ; //여기서 문제생기네
+            FtpWebResponse ftpWebResponse = (FtpWebResponse)ftpWebRequest.GetResponse(); //여기서 문제생기네
             Stream sourceStream = ftpWebResponse.GetResponseStream();
 
-            FileStream targetFileStream = new FileStream(localFolderPath, FileMode.Create, FileAccess.Write);
+            FileStream targetFileStream = new FileStream(localFolderPath + "/" + downloadFile, FileMode.Create, FileAccess.Write);
 
 
             int length = 2048;
             Byte[] buffer = new Byte[length];
             int bytesRead = sourceStream.Read(buffer, 0, length);
-            while(bytesRead >0)
+            while (bytesRead > 0)
             {
                 targetFileStream.Write(buffer, 0, length);
                 bytesRead = sourceStream.Read(buffer, 0, length);
             }
+            targetFileStream.Close();
+            sourceStream.Close();
 
-            */
-
-            /*byte[] bufferByteArray = new byte[1024];
-            while (true)
-
-            {
-                int byteCount = sourceStream.Read(bufferByteArray, 0, bufferByteArray.Length);
-                if (byteCount == 0)
-                {
-                    break;
-                }
-                targetFileStream.Write(bufferByteArray, 0, byteCount);
-            }
-            */
-
-
-
-            
-     
-
-            for(int i = 0; i<downloadFiles.Length;i++)
-            {
-                Console.WriteLine(downLoadList[i]);
-            }
-            resultMsg = "";
-            return false;
+            downLoadList.Add(downloadFile);
         }
     }
 }
