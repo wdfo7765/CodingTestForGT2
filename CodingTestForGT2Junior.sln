@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTestForGT2Junior", "CodingTestForGT2Junior.csproj", "{3267004B-EDD3-4348-AFED-AFD12B209F0D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingTestForGT2JuniorTests", "..\CodingTestForGT2JuniorTests\CodingTestForGT2JuniorTests.csproj", "{904B3268-8748-48E7-9048-07BD572CA9AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{3267004B-EDD3-4348-AFED-AFD12B209F0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3267004B-EDD3-4348-AFED-AFD12B209F0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3267004B-EDD3-4348-AFED-AFD12B209F0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{904B3268-8748-48E7-9048-07BD572CA9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{904B3268-8748-48E7-9048-07BD572CA9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{904B3268-8748-48E7-9048-07BD572CA9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{904B3268-8748-48E7-9048-07BD572CA9AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3361A0B5-2967-4F36-B08F-D52375A59C0C}
 	EndGlobalSection
 EndGlobal
