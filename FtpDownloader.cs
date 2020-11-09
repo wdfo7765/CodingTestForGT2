@@ -39,55 +39,39 @@ namespace CodingTestForGT2Junior
             string[] check = path.Split('/');
             if (check[check.Length-1].IndexOf('.') == -1)
             {
+                string folderPath = "C:"+localFolderPath+"/"+check[check.Length-1];
+                DirectoryInfo di = new DirectoryInfo(folderPath);
+                Console.WriteLine(folderPath);
+                if(di.Exists==false)
+                {
+                    di.Create();
+                    Console.Write("여기되고있니?");
+                }
+        
+
+
                 //폴더일때
                 downloadFiles = findList(address, remotePath);
-
-
             }
             else
             {
-                address = "";
-                for(int i=0; i<check.Length-1;i++)
-                {
-                    address += check[i];
-
-                }
+                address.Substring(0, address.Length - check[check.Length - 1].Length);
+                Console.WriteLine(address);
                 downloadFiles = findList(address, "");
-                for (int i = 0; i < downloadFiles.Length; i++)
-                {
-                    doDownLoad(address, id, password, localFolderPath, downloadFiles[i]);
-
-                }
-
-
             }
-            for(int i = 0; i<downloadFiles.Length;i++)
+            for (int i = 0; i < downloadFiles.Length; i++)
             {
-               // Console.WriteLine(downLoadList[i]);
+                doDownLoad(address, id, password, localFolderPath, downloadFiles[i]);
             }
+
             resultMsg = "";
             return false;
         }
-        void doRecursion(string[] files,string address)
-        {
-            for (int i = 0; i < files.Length; i++)
-            {
-                if (files[i].IndexOf('.') == -1)
-                {
-                    doDownLoad(address +"/"+ files[i], id, password, localFolderPath, files[i]);
-                }
-                else
-                {
-                    doRecursion(findList(address + remotePath, downloadFiles[i]),address + remotePath + downloadFiles[i]);
 
-                }
-
-
-            }
-        }
         string[] findList(string address,string remotePath)
         {
             string[] files;
+            Console.WriteLine(address + remotePath );
             reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(address  + remotePath));
             reqFTP.UseBinary = true;
             reqFTP.Credentials = new NetworkCredential(id, password);
@@ -109,7 +93,7 @@ namespace CodingTestForGT2Junior
             files = result.ToString().Split('\n');
             for (int i = 0; i < files.Length; i++)
             {
-                Console.WriteLine(files[i]);
+                Console.WriteLine(files[i] + "이건가");
             }
             return files;
         }
