@@ -132,6 +132,7 @@ namespace CodingTestForGT2Junior
             XmlNode root;
             DateTime now = DateTime.Now;
 
+
             //XML파일이 존재할시
             if (xmlFile.Exists)
             {
@@ -143,26 +144,31 @@ namespace CodingTestForGT2Junior
             {
                 root = xml.CreateElement("INFO");
             }
+            XmlNode connect = xml.CreateElement("FTPConnect");
+
+
             //Node에 정보 작성
             XmlNode time = xml.CreateElement("Time");
             time.InnerText = now.ToString();
-            root.AppendChild(time);
+            connect.AppendChild(time);
             XmlNode ID = xml.CreateElement("ID");
             ID.InnerText = id;
-            root.AppendChild(ID);
+            connect.AppendChild(ID);
             XmlNode PassWord = xml.CreateElement("PassWord");
             PassWord.InnerText = password;
-            root.AppendChild(PassWord);
+            connect.AppendChild(PassWord);
             XmlNode LocalFolderPath = xml.CreateElement("LocalFolderPath");
             LocalFolderPath.InnerText = localFolderPath;
-            root.AppendChild(LocalFolderPath);
+            connect.AppendChild(LocalFolderPath);
             XmlNode Address = xml.CreateElement("Address");
             Address.InnerText = address;
-            root.AppendChild(Address);
+            connect.AppendChild(Address);
             XmlNode RemotePath = xml.CreateElement("RemotePath");
             RemotePath.InnerText = remotePath;
-            root.AppendChild(RemotePath);
+            connect.AppendChild(RemotePath);
 
+
+            root.AppendChild(connect);
             //정보가 담긴 root 노드를 child로 추가
             xml.AppendChild(root);
 
