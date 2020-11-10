@@ -90,9 +90,6 @@ namespace CodingTestForGT2Junior
         public string[] findList(string address,string remotePath)
         {
             string[] files;
-
-
-
             saveXML();
 
             //FTP정보들로 FTP서버와 연결
@@ -124,23 +121,29 @@ namespace CodingTestForGT2Junior
             }
             return files;
         }
-
+        /// <summary>
+        /// FTP연결 정보를 XML파일에 저장
+        /// </summary>
         public void saveXML()
         {
+            //초기 변수선언
             FileInfo xmlFile = new FileInfo(savePath + "FTPInfo.xml");
             XmlDocument xml = new XmlDocument();
             XmlNode root;
             DateTime now = DateTime.Now;
+
+            //XML파일이 존재할시
             if (xmlFile.Exists)
             {
                 xml.Load(savePath + "FTPInfo.xml");
                 root = xml.DocumentElement;
             }
+            //XML파일이 존재하지 않을 경우
             else
             {
                 root = xml.CreateElement("INFO");
             }
-
+            //Node에 정보 작성
             XmlNode time = xml.CreateElement("Time");
             time.InnerText = now.ToString();
             root.AppendChild(time);
@@ -159,7 +162,11 @@ namespace CodingTestForGT2Junior
             XmlNode RemotePath = xml.CreateElement("RemotePath");
             RemotePath.InnerText = remotePath;
             root.AppendChild(RemotePath);
+
+            //정보가 담긴 root 노드를 child로 추가
             xml.AppendChild(root);
+
+            //xml 저장
             xml.Save(savePath + "FTPInfo.xml");
         }
 
