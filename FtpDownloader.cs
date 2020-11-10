@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Net;
+using System.Configuration;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CodingTestForGT2Junior
 {
@@ -14,11 +16,18 @@ namespace CodingTestForGT2Junior
         string[] downloadFiles;
         string address, id, password, remotePath, localFolderPath; //변수선언
 
+        AppSettingsReader ar = new AppSettingsReader();
+
         StringBuilder result = new StringBuilder();
         FtpWebRequest reqFTP;
+        string savePath;
 
         bool IDownloader.DoDownload(out string resultMsg)
         {
+
+            savePath = (string)ar.GetValue("xmlPath", typeof(string));
+
+
             //FTP정보를 입력받음
             Console.WriteLine("<FTP Data Downloader>");
             Console.Write("Input Addrrss to download data: ");
@@ -68,7 +77,7 @@ namespace CodingTestForGT2Junior
                 doDownLoad(address, id, password, localFolderPath, downloadFiles[i]);
             }
 
-            resultMsg = "";
+            resultMsg = "Succeeded to download data from FTP Server";
             return false;
         }
 
@@ -81,6 +90,10 @@ namespace CodingTestForGT2Junior
         public string[] findList(string address,string remotePath)
         {
             string[] files;
+
+
+
+            saveXML();
 
             //FTP정보들로 FTP서버와 연결
             reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(address  + remotePath));
@@ -110,6 +123,44 @@ namespace CodingTestForGT2Junior
                 Console.WriteLine(files[i]);
             }
             return files;
+        }
+
+        public void saveXML()
+        {
+            FileInfo xmlFile = new FileInfo(savePath + "FTPInfo.xml");
+            XmlDocument xml = new XmlDocument();
+            XmlNode root;
+            DateTime now = DateTime.Now;
+            if (xmlFile.Exists)
+            {
+                xml.Load(savePath + "FTPInfo.xml");
+                root = xml.DocumentElement;
+            }
+            else
+            {
+                root = xml.CreateElement("INFO");
+            }
+
+            XmlNode time = xml.CreateElement("Time");
+            time.InnerText = now.ToString();
+            root.AppendChild(time);
+            XmlNode ID = xml.CreateElement("ID");
+            ID.InnerText = id;
+            root.AppendChild(ID);
+            XmlNode PassWord = xml.CreateElement("PassWord");
+            PassWord.InnerText = password;
+            root.AppendChild(PassWord);
+            XmlNode LocalFolderPath = xml.CreateElement("LocalFolderPath");
+            LocalFolderPath.InnerText = localFolderPath;
+            root.AppendChild(LocalFolderPath);
+            XmlNode Address = xml.CreateElement("Address");
+            Address.InnerText = address;
+            root.AppendChild(Address);
+            XmlNode RemotePath = xml.CreateElement("RemotePath");
+            RemotePath.InnerText = remotePath;
+            root.AppendChild(RemotePath);
+            xml.AppendChild(root);
+            xml.Save(savePath + "FTPInfo.xml");
         }
 
         /// <summary>

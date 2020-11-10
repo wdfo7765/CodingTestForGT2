@@ -42,7 +42,7 @@ namespace CodingTestForGT2Junior
             using (var client = new WebClient())
             {
     
-                client.DownloadFile(url, downlaodLocalFolderPath);//여기서 인증오류 나고있음
+                client.DownloadFile(url, downlaodLocalFolderPath);
 
                }
 
