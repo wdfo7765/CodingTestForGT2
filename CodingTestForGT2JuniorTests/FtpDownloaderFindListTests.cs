@@ -26,11 +26,11 @@ namespace CodingTestForGT2Junior
         {
             bool istrue = false;
 
-            downloadFiles = testDownLoader.findList(address, remotePath,id,password,localFolderPath);
+            downloadFiles = testDownLoader.findList(address, remotePath, id, password, localFolderPath);
 
-            foreach(string str in downloadFiles)
+            foreach (string str in downloadFiles)
             {
-                if(str == "bulletinb-369.txt")
+                if (str == "bulletinb-369.txt")
                 {
                     istrue = true;
                 }
@@ -41,7 +41,7 @@ namespace CodingTestForGT2Junior
         [TestMethod()]
         public void doDownloadTest()
         {
-            downloadFiles = testDownLoader.findList(address, remotePath,id,password, localFolderPath);
+            downloadFiles = testDownLoader.findList(address, remotePath, id, password, localFolderPath);
             testDownLoader.doDownLoad(address, id, password, localFolderPath, downloadFiles[0]);
             FileInfo fi = new FileInfo(localFolderPath + "/" + downloadFiles[0]);
             Assert.IsTrue(fi.Exists);
