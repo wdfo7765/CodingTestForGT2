@@ -14,34 +14,27 @@ namespace CodingTestForGT2Junior
     {
 
         string[] downloadFiles;
-        string address, id, password, remotePath, localFolderPath; //변수선언
-
+        string savePath;
         AppSettingsReader ar = new AppSettingsReader();
 
         StringBuilder result = new StringBuilder();
         FtpWebRequest reqFTP;
-        string savePath;
 
         bool IDownloader.DoDownload(out string resultMsg)
         {
-
+      
+            //App.config에서 XML 저장 정보를 가져옴
             savePath = (string)ar.GetValue("xmlPath", typeof(string));
 
-
             //FTP정보를 입력받음
-            Console.WriteLine("<FTP Data Downloader>");
-            Console.Write("Input Addrrss to download data: ");
-            address = Console.ReadLine();
-            Console.Write("Input ID to download data: ");
-            id = Console.ReadLine();
-            Console.Write("Input PassWord to download data: ");
-            password = Console.ReadLine();
-            Console.Write("Input RemotePath to download data: ");
-            remotePath = Console.ReadLine();
-            Console.WriteLine();
-            Console.Write("Input LocalFolderPath file path: ");
-            localFolderPath = Console.ReadLine();
-            Console.WriteLine();
+            string[] inputInfo = printHelp();
+            //FTP정보 할당
+            string address =inputInfo[0];
+            string id = inputInfo[1];
+            string password = inputInfo[2];
+            string remotePath = inputInfo[3];
+            string localFolderPath = inputInfo[4];
+
 
             //입력한 정보가 파일인지 폴더인지 구분
             string path = address + remotePath;
@@ -59,16 +52,15 @@ namespace CodingTestForGT2Junior
                 }
  
                 //다운로드 할 파일들의 목록
-                downloadFiles = findList(address, remotePath);
+                downloadFiles = findList(address, remotePath, id, password,localFolderPath);
             }
-
             //입력한 정보가 파일일 경우
             else
             {
                 //파일인 경우 파일이 존재하는 폴더에 있는 파일들을 다운로드
                 address.Substring(0, address.Length - check[check.Length - 1].Length);
                 
-                downloadFiles = findList(address, "");
+                downloadFiles = findList(address, "", id, password, localFolderPath);
             }
 
             //파일 목록을 이용하여 다운로드
@@ -80,17 +72,42 @@ namespace CodingTestForGT2Junior
             resultMsg = "Succeeded to download data from FTP Server";
             return false;
         }
+        /// <summary>
+        /// FTP 정보를 입력받음
+        /// </summary>
+        /// <returns></returns>
+        public string[] printHelp()
+        {
+            string[] inputInfo = new string[5];
+            Console.WriteLine("<FTP Data Downloader>");
+            Console.Write("Input Addrrss to download data: ");
+            inputInfo[0] = Console.ReadLine();
+            Console.Write("Input ID to download data: ");
+            inputInfo[1] = Console.ReadLine();
+            Console.Write("Input PassWord to download data: ");
+            inputInfo[2] = Console.ReadLine();
+            Console.Write("Input RemotePath to download data: ");
+            inputInfo[3] = Console.ReadLine();
+            Console.WriteLine();
+            Console.Write("Input LocalFolderPath file path: ");
+            inputInfo[4] = Console.ReadLine();
+            Console.WriteLine();
+            return inputInfo;
+        }
 
         /// <summary>
         /// FTP서버에 존재하는 파일 목록을 불러옴
         /// </summary>
         /// <param name="address"></param>
         /// <param name="remotePath"></param>
+        /// <param name="id"></param>
+        /// <param name="password"></param>
+        /// <param name="localFolderPath"></param>
         /// <returns></returns>
-        public string[] findList(string address,string remotePath)
+        public string[] findList(string address,string remotePath,string id, string password, string localFolderPath)
         {
             string[] files;
-            saveXML();
+            saveXML(savePath,id,password,localFolderPath,address,remotePath);
 
             //FTP정보들로 FTP서버와 연결
             reqFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(address  + remotePath));
@@ -99,7 +116,6 @@ namespace CodingTestForGT2Junior
             reqFTP.Method = WebRequestMethods.Ftp.ListDirectory;
             WebResponse response = reqFTP.GetResponse(); //Response
             StreamReader reader = new StreamReader(response.GetResponseStream());
-
 
             //Stream을 line으로 저장
             string line = reader.ReadLine();
@@ -121,10 +137,17 @@ namespace CodingTestForGT2Junior
             }
             return files;
         }
+
         /// <summary>
         /// FTP연결 정보를 XML파일에 저장
         /// </summary>
-        public void saveXML()
+        /// <param name="savePath"></param>
+        /// <param name="id"></param>
+        /// <param name="password"></param>
+        /// <param name="localFolderPath"></param>
+        /// <param name="address"></param>
+        /// <param name="remotePath"></param>
+        public void saveXML(string savePath , string id, string password, string localFolderPath , string address, string remotePath)
         {
             //초기 변수선언
             FileInfo xmlFile = new FileInfo(savePath + "FTPInfo.xml");
@@ -146,7 +169,6 @@ namespace CodingTestForGT2Junior
             }
             XmlNode connect = xml.CreateElement("FTPConnect");
 
-
             //Node에 정보 작성
             XmlNode time = xml.CreateElement("Time");
             time.InnerText = now.ToString();
@@ -167,7 +189,6 @@ namespace CodingTestForGT2Junior
             RemotePath.InnerText = remotePath;
             connect.AppendChild(RemotePath);
 
-
             root.AppendChild(connect);
             //정보가 담긴 root 노드를 child로 추가
             xml.AppendChild(root);
@@ -175,7 +196,6 @@ namespace CodingTestForGT2Junior
             //xml 저장
             xml.Save(savePath + "FTPInfo.xml");
         }
-
         /// <summary>
         /// FTP서버에 존재하는 파일들을 다운로드
         /// </summary>
