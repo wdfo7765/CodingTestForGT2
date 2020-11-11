@@ -29,22 +29,17 @@ namespace CodingTestForGT2Junior
             //파일이 존재하는지 확인
             isExist(downlaodLocalFolderPath);
 
-
+            //타겟파일 경로 오류 체크
             if(!Directory.CreateDirectory(Path.GetDirectoryName(downlaodLocalFolderPath)).Exists)
             {
                 resultMsg = "Please, check the target file path.";
                 return false;
             }
 
-            //http://www.celestrak.com/NORAD/elements/tle-new.txt
-            using (var client = new WebClient())
-            {
-                client.DownloadFile(url, downlaodLocalFolderPath);
-            }
-
-
-            //다운로드가 되었는지 확인  -------- 이함수 별로필요없는거같음 확인 필요
-            if (isDownloaded(downlaodLocalFolderPath))
+            //파일 다운로드
+            downloadFile(url, downlaodLocalFolderPath);
+            
+            if (File.Exists(downlaodLocalFolderPath))
             {
                 resultMsg = "Succeeded to download data from URL.";
                 return true;
@@ -85,22 +80,20 @@ namespace CodingTestForGT2Junior
                 File.Delete(downlaodLocalFolderPath);
             }
         }
-        /// <summary>
-        /// 다운로드가 되었는지 확인
-        /// </summary>
-        /// <param name="downlaodLocalFolderPath"></param>
-        /// <returns></returns>
-        public bool isDownloaded(string downlaodLocalFolderPath )
-        {
 
-            if (File.Exists(downlaodLocalFolderPath))
+        /// <summary>
+        /// 파일 다운로드
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="downlaodLocalFolderPath"></param>
+        public void downloadFile(string url, string downlaodLocalFolderPath)
+        {
+            //http://www.celestrak.com/NORAD/elements/tle-new.txt
+            using (var client = new WebClient())
             {
-                return true;
-            }
-            else
-            {
-                return false;
+                client.DownloadFile(url, downlaodLocalFolderPath);
             }
         }
+
     }
 }
